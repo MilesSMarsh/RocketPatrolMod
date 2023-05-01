@@ -34,7 +34,10 @@ class Menu extends Phaser.Scene{
         menuConfig.backgroundColor = '#00FF00';
         menuConfig.color = '#000';
         this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding, 'Press <- for Novice or -> for Expert', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding*5, 'Press (P) for Pass-N-Play', menuConfig).setOrigin(0.5);
 
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+        keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     }
@@ -47,7 +50,8 @@ class Menu extends Phaser.Scene{
           // easy mode
           game.settings = {
             spaceshipSpeed: 3,
-            gameTimer: 60000
+            gameTimer: 60000,
+            passNPlay: false
           }
           this.sound.play('sfx_select');
           this.scene.start('playScene');    
@@ -56,7 +60,18 @@ class Menu extends Phaser.Scene{
           // hard mode
           game.settings = {
             spaceshipSpeed: 4,
-            gameTimer: 45000
+            gameTimer: 45000,
+            passNPlay: false
+          }
+          this.sound.play('sfx_select');
+          this.scene.start('playScene');    
+        }
+        if (Phaser.Input.Keyboard.JustDown(keyP)){
+          //2 Player mode
+          game.settings = {
+            spaceshipSpeed: 3,
+            gameTimer: 60000,
+            passNPlay: true
           }
           this.sound.play('sfx_select');
           this.scene.start('playScene');    

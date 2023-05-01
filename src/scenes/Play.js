@@ -16,8 +16,8 @@ class Play extends Phaser.Scene{
 
     create(){
 
-
-
+        this.mouseEnabled = false;
+        this.change = true;
         //place tile sprite
         this.stars = this.add.tileSprite(0, 0, 640, 480, 'stars').setOrigin(0, 0);
         this.galaxy = this.add.tileSprite(0, 80, 800, 480, 'galaxy').setOrigin(0, 0);
@@ -37,6 +37,8 @@ class Play extends Phaser.Scene{
         this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0);
 
         //define keys
+        keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -57,7 +59,11 @@ class Play extends Phaser.Scene{
             frameRate: 30
         });
 
+
+        //score UI settings
         this.p1Score = 0;
+        this.p2Score = 0;
+        this.p1Turn = true;
 
         let scoreConfig = {
             fontFamily: 'Courier',
@@ -72,17 +78,29 @@ class Play extends Phaser.Scene{
             fixedWidth: 100
         }
 
+        //scoring ui
+        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, `P1:${this.p1Score}`, scoreConfig);
+        this.scoreRight = this.add.text(game.config.width - borderUISize - borderPadding * 10.5, borderUISize + borderPadding*2, `P2:${this.p2Score}`, scoreConfig);
+        if(!game.settings.passNPlay){
+            this.scoreRight.setVisible(false);
+        }
+        else{
+            this.scoreRight.setVisible(true);
+        }
+        this.highScoreText = this.add.text(game.config.width - borderUISize - borderPadding * 10.5, borderUISize + borderPadding*2, `HI:${highScore}`, scoreConfig);
+        if(game.settings.passNPlay){
+            this.highScoreText.setVisible(false);
+        }
+        else{
+            this.highScoreText.setVisible(true);
+        }
 
-        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
-        this.highScoreText = this.add.text(game.config.width - borderUISize - borderPadding * 10.5, borderUISize + borderPadding*2, highScore, scoreConfig);
-        
-        
-        this.initialTime = game.settings.gameTimer;
-        this.countDown = this.add.text(borderUISize + borderPadding + 300, borderUISize + borderPadding*2, this.initialTime/1000 , scoreConfig);
-        
-        
         this.firingText = this.add.text(borderUISize + borderPadding + 150, borderUISize + borderPadding*2, "FIRE", scoreConfig);
         this.firingText.setVisible(false);
+        
+        //countdown
+        this.initialTime = game.settings.gameTimer;
+        this.countDown = this.add.text(borderUISize + borderPadding + 300, borderUISize + borderPadding*2, this.initialTime/1000 , scoreConfig);
         
         this.gameOver = false;
 
@@ -90,17 +108,36 @@ class Play extends Phaser.Scene{
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             if (this.p1Score > highScore){
                 highScore = this.p1Score;
-                this.highScoreText.text = highScore;
+                this.highScoreText.text = `HI:${highScore}`;
             }
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 128, 'HIGH SCORE: ' + highScore, scoreConfig).setOrigin(0.5);
+            if(game.settings.passNPlay){
+                if(this.p1Score > this.p2Score){
+                    this.add.text(game.config.width/2, game.config.height/2 + 128, 'PLAYER 1 WIN: ' + this.p1Score, scoreConfig).setOrigin(0.5);
+                }
+                else if(this.p2Score > this.p1Score){
+                    this.add.text(game.config.width/2, game.config.height/2 + 128, 'PLAYER 2 WIN: ' + this.p2Score, scoreConfig).setOrigin(0.5);
+                }
+                else{
+                    this.add.text(game.config.width/2, game.config.height/2 + 128, 'TIE!: ' + this.p1Score, scoreConfig).setOrigin(0.5);
+                }
+            }
+            else{
+                this.add.text(game.config.width/2, game.config.height/2 + 128, 'HIGH SCORE: ' + highScore, scoreConfig).setOrigin(0.5);
+            }
             this.gameOver = true;
         }, null, this);
 
     }
 
     update(){
+
+        //mouse control
+        if(Phaser.Input.Keyboard.JustDown(keyM)){
+            this.mouseEnabled = true;
+        }
+
 
 
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)){
@@ -132,6 +169,20 @@ class Play extends Phaser.Scene{
 
         const progress = this.clock.getProgress();
         this.countDown.setText(game.settings.gameTimer/1000 - (Math.floor((progress*100)*(game.settings.gameTimer/100000))));
+        
+        if((progress > 0.5 )& this.change){
+            //change movement speed
+            this.ship01.moveSpeed *= 2;
+
+            this.ship02.moveSpeed *= 2;
+
+            this.ship03.moveSpeed *= 2;
+
+            this.ship04.moveSpeed *= 2;
+
+            this.change = false;
+        }
+
 
         // check collisions
         if (this.checkCollision(this.p1Rocket, this.ship04)) {
@@ -180,9 +231,24 @@ class Play extends Phaser.Scene{
             boom.destroy();
         });
 
-        this.p1Score += ship.points;
-        this.scoreLeft.text = this.p1Score;
+        if(game.settings.passNPlay){
+            if(this.p1Turn){
+                this.p1Score += ship.points;
+                this.scoreLeft.text = `P1:${this.p1Score}`;
+                this.p1Turn = false;
+            }
+            else{
+                this.p2Score += ship.points;
+                this.scoreRight.text = `P2:${this.p2Score}`;
+                this.p1Turn = true;
+            }
+        }
+        else{
+            this.p1Score += ship.points;
+            this.scoreLeft.text = `P1:${this.p1Score}`;
+        }
         this.sound.play('sfx_explosion');
+        
     }
 
     
