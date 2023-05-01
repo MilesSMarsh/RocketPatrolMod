@@ -138,11 +138,9 @@ class Play extends Phaser.Scene{
         
         if(Phaser.Input.Keyboard.JustDown(keyM) && !this.mouseEnabled){
             this.mouseEnabled = true;
-            console.log("on");
         }
         if(Phaser.Input.Keyboard.JustDown(keyN) && this.mouseEnabled){
             this.mouseEnabled = false;
-            console.log("off");
         }
 
         
