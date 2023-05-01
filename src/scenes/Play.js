@@ -37,6 +37,7 @@ class Play extends Phaser.Scene{
         this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0);
 
         //define keys
+        keyN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.N);
         keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
@@ -134,11 +135,31 @@ class Play extends Phaser.Scene{
     update(){
 
         //mouse control
-        if(Phaser.Input.Keyboard.JustDown(keyM)){
+        
+        if(Phaser.Input.Keyboard.JustDown(keyM) && !this.mouseEnabled){
             this.mouseEnabled = true;
+            console.log("on");
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyN) && this.mouseEnabled){
+            this.mouseEnabled = false;
+            console.log("off");
         }
 
+        
 
+        if(this.mouseEnabled && this.game.input.mousePointer.x > this.p1Rocket.x){
+            this.p1Rocket.x += this.p1Rocket.moveSpeed;
+        }
+
+        if(this.mouseEnabled && this.game.input.mousePointer.x < this.p1Rocket.x){
+            this.p1Rocket.x -= this.p1Rocket.moveSpeed;
+        }
+
+        if(this.mouseEnabled){
+            if(this.input.activePointer.isDown){
+                this.p1Rocket.isFiring = true;
+            }
+        }
 
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)){
             this.scene.restart()
@@ -147,7 +168,7 @@ class Play extends Phaser.Scene{
         this.stars.tilePositionX -= 4;
         this.galaxy.tilePositionX -= 0.5;
         this.asteroids.tilePositionX -= 2;
-        this.stars.asteroidsPositionY-= 1;
+        this.asteroids.tilePositionY-= 0.1;
 
 
         if(!this.gameOver){
