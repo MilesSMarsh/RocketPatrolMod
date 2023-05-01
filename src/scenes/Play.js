@@ -7,9 +7,11 @@ class Play extends Phaser.Scene{
         //load images/tile sprites
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
-        this.load.image('starfield', './assets/starfield.png');
+        this.load.image('stars', './assets/stars.png');
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
         this.load.image('tinyship', './assets/tinyship.png');
+        this.load.image('galaxy', './assets/galaxy.png');
+        this.load.image('asteroids', './assets/asteroids.png');
     }
 
     create(){
@@ -17,7 +19,10 @@ class Play extends Phaser.Scene{
 
 
         //place tile sprite
-        this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
+        this.stars = this.add.tileSprite(0, 0, 640, 480, 'stars').setOrigin(0, 0);
+        this.galaxy = this.add.tileSprite(0, 80, 800, 480, 'galaxy').setOrigin(0, 0);
+        this.galaxy.setScale(2);
+        this.asteroids = this.add.tileSprite(0, 0, 640, 480, 'asteroids').setOrigin(0, 0);
 
         //green UI background
         this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0, 0);
@@ -102,7 +107,12 @@ class Play extends Phaser.Scene{
             this.scene.restart()
         }
 
-        this.starfield.tilePositionX -= 4;
+        this.stars.tilePositionX -= 4;
+        this.galaxy.tilePositionX -= 0.5;
+        this.asteroids.tilePositionX -= 2;
+        this.stars.asteroidsPositionY-= 1;
+
+
         if(!this.gameOver){
             //update Rocket
             this.p1Rocket.update();
