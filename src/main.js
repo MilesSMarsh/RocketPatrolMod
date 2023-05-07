@@ -19,6 +19,8 @@
 // Create a new enemy Spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (15) - because I changed the arguments of spaceship to accept a movement speed, I just made and instance of spaceship with double speed and worth more points
 // Implement an alternating two-player mode (15) - I made a boolean that switches on and off every time a rocket is fired and made a second score text box to display player two's score, then at the end of the play sequence I sdisplay the winner or if their is a tie
 // Implement mouse control for player movement and mouse click to fire (15) - I made the spacec ship move right if the mouse is to the right of it, and left if the mouse is to the left of it, if you click it fires
+//
+//credits: I just used Phaser API and The proffesors examples
 
 let config = {
     type: Phaser.CANVAS,
